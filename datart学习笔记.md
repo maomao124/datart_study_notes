@@ -595,3 +595,300 @@ PS D:\opensoft\datart\datart-server\config>
 
 ## datart.conf
 
+配置如下：
+
+```properties
+# ====== 应用数据库配置 ======
+
+# 数据库IP或域名
+datasource.ip=localhost
+
+# 数据库端口
+datasource.port=3306
+
+# 数据库名称
+datasource.database=datart
+
+# 用户名
+datasource.username=root
+
+# 密码
+datasource.password=root
+
+# ====== 应用服务器配置 ======
+
+# 服务器端口
+server.port=8080
+
+# 服务器地址
+#   Web 服务所绑定的本机网卡地址，一般为内网地址
+server.address=0.0.0.0
+
+# ====== datart 全局配置 ======
+
+# 应用主页地址
+#   浏览器访问应用主页输入的地址，一般为公网地址
+datart.address=http://127.0.0.1:8080
+
+# Chrome WebDriver 地址
+datart.webdriver-path=http://127.0.0.1:4444/wd/hub
+
+# 是否允许注册账户
+datart.user.register=true
+# 注册账户时，是否需要邮件激活
+datart.send-mail=false
+
+# 注册邮件有效期/小时, 默认48小时
+datart.register.expire-hours=
+# 邀请邮件有效期/小时, 默认48小时
+datart.invite.expire-hours=
+
+# 租户管理模式：platform-平台(默认)，team-团队
+datart.tenant-management-mode=platform
+```
+
+
+
+
+
+## application-config.yml
+
+`application-config.yml` 为应用配置文件，里面包含 datart 应用的所有配置。`datart.conf` 中的内容实际上是 `application-config.yml` 部分配置项的快捷方式。
+
+
+
+内容如下：
+
+```yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://${datasource.ip:null}:${datasource.port:3306}/${datasource.database:datart}?&allowMultiQueries=true&characterEncoding=utf-8
+    username: ${datasource.username:root}
+    password: ${datasource.password:123456}
+
+# security:
+#   oauth2:
+#     client:
+#       registration:
+#         cas:
+#           provider: cas
+#           client-id: "xxxxx"
+#           client-name: "Sign in with CAS"
+#           client-secret: "xxx"
+#           authorization-grant-type: authorization_code
+#           client-authentication-method: post
+#           redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#           scope: userinfo
+#       provider:
+#         cas:
+#           authorization-uri: https://cas.xxx.com/cas/oauth2.0/authorize
+#           token-uri: https://cas.xxx.com/cas/oauth2.0/accessToken
+#           user-info-uri: https://cas.xxx.com/cas/oauth2.0/profile
+#           user-name-attribute: id
+#           userMapping:
+#             email: "attributes.email"
+#             name: "attributes.name"
+#             avatar: "attributes.avatar"
+
+# ldap config
+
+# ldap:
+#   urls: ldap://{IP}:{PORT}
+#   base: xxx
+#   username: {username}
+#   password: {password}
+#   attribute-mapping:
+#     username: cn # 自定义登录用户名对应属性名
+
+# mail config
+
+# mail:
+#   host: { 邮箱服务地址 }
+#   port: { 端口号 }
+#   username: { 邮箱地址 }
+#   fromAddress:
+#   password: { 邮箱服务密码 }
+#   senderName: { 发送者昵称 }
+#
+#   properties:
+#     smtp:
+#       starttls:
+#         enable: true
+#         required: true
+#       auth: true
+#     mail:
+#       smtp:
+#         ssl:
+#           enable: true
+
+
+# redis config
+
+#  redis:
+#    port: 6379
+#    host: { HOST }
+
+
+server:
+  port: ${server.port:8080}
+  address: ${server.ip:0.0.0.0}
+  ssl:
+    enabled: false
+    key-store: keystore.p12 # Absolute path
+    key-store-password: password
+    keyStoreType: PKCS12
+    keyAlias: tomcat
+
+datart:
+  migration:
+    enable: true # 是否开启数据库自动升级
+  server:
+    address: ${datart.address:http://127.0.0.1:8080}
+
+  # 租户管理模式：platform-平台(默认)，team-团队
+  tenant-management-mode: platform
+
+  user:
+    register: true # 是否允许注册
+    active:
+      send-mail: ${datart.send-mail:false}  # 注册用户时是否需要邮件验证激活
+      expire-hours: ${datart.register.expire-hours:48} # 注册邮件有效期/小时
+    invite:
+      expire-hours: ${datart.invite.expire-hours:48} # 邀请邮件有效期/小时
+
+  security:
+    token:
+      secret: "d@a$t%a^r&a*t" #加密密钥
+      timeout-min: 30  # 登录会话有效时长，单位：分钟。
+
+  env:
+    file-path: ${user.dir}/files # 服务端文件保存位置
+
+  screenshot:
+    timeout-seconds: 60
+    webdriver-type: CHROME
+    webdriver-path: ${datart.webdriver-path:}
+```
+
+
+
+具体介绍可以查看[官网文档](https://running-elephant.gitee.io/datart-docs/docs/index.html#3-2-%E5%BA%94%E7%94%A8%E9%85%8D%E7%BD%AE)
+
+
+
+
+
+## logback.xml
+
+日志配置文件，使用的是 logback
+
+官网文档链接：https://logback.qos.ch/manual/configuration.html
+
+
+
+
+
+
+
+# 入门
+
+## 创建数据源
+
+进入系统之后，首页是可视化目录的展示页面，主导航栏在左侧
+
+
+
+![image-20230911153517682](img/datart学习笔记/image-20230911153517682.png)
+
+
+
+
+
+
+
+
+
+
+
+制作可视化作品首先需要一个数据源，点击主导航栏上的`数据源`菜单来创建一个 `MySQL` 数据源，输入名称、选择数据源类型并填写所需的参数，点击`测试连接`，测试成功之后就可以保存了
+
+
+
+![image-20230911153611178](img/datart学习笔记/image-20230911153611178.png)
+
+
+
+点击+号
+
+![image-20230911153822200](img/datart学习笔记/image-20230911153822200.png)
+
+
+
+
+
+点击保存
+
+![image-20230911153931200](img/datart学习笔记/image-20230911153931200.png)
+
+
+
+
+
+
+
+## 创建数据视图
+
+然后点击主导航栏上的`数据视图`菜单
+
+![image-20230911154019318](img/datart学习笔记/image-20230911154019318.png)
+
+
+
+点击数据视图右上角的加号按钮，选择`新建数据视图`， 中部的编辑器会创建一个新的页签
+
+
+
+![image-20230911154041813](img/datart学习笔记/image-20230911154041813.png)
+
+
+
+
+
+选择SQL视图
+
+在编辑器工具栏中选择刚刚创建的数据源
+
+![image-20230911154226483](img/datart学习笔记/image-20230911154226483.png)
+
+
+
+编写SQL，完成之后点击工具栏上的`执行`按钮，就可以在下方看到执行结果
+
+![image-20230911154456751](img/datart学习笔记/image-20230911154456751.png)
+
+
+
+
+
+编辑完成后，点击右上角的保存按钮保存数据视图
+
+![image-20230911154736684](img/datart学习笔记/image-20230911154736684.png)
+
+
+
+![image-20230911154746770](img/datart学习笔记/image-20230911154746770.png)
+
+
+
+![image-20230911154832932](img/datart学习笔记/image-20230911154832932.png)
+
+
+
+
+
+
+
+## 创建数据图表
+
